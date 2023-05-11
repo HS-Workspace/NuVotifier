@@ -354,10 +354,8 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
         if (debug) {
             getLogger().info("Got a " + protocolVersion.humanReadable + " vote record from " + remoteAddress + " -> " + vote);
         }
-        if (FOLIA_SUPPORTED) {
-            Bukkit.getGlobalRegionScheduler().run(this, t -> fireVotifierEvent(vote));
-        } else {
-            Bukkit.getScheduler().runTask(this, () -> fireVotifierEvent(vote));
+        if (scheduler != null) {
+            scheduler.sync(() -> fireVotifierEvent(vote));
         }
     }
 
@@ -380,10 +378,8 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
         if (debug) {
             getLogger().info("Got a forwarded vote -> " + v);
         }
-        if (FOLIA_SUPPORTED) {
-            Bukkit.getGlobalRegionScheduler().run(this, t -> fireVotifierEvent(v));
-        } else {
-            Bukkit.getScheduler().runTask(this, () -> fireVotifierEvent(v));
+        if (scheduler != null) {
+            scheduler.sync(() -> fireVotifierEvent(v));
         }
     }
 

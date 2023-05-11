@@ -60,6 +60,18 @@ import java.util.logging.Level;
  * @author Kramer Campbell
  */
 public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, VotifierPlugin, ForwardedVoteListener {
+    private static final boolean FOLIA_SUPPORTED;
+
+    static {
+        boolean foliaSupported = false;
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            foliaSupported = true;
+        } catch (ClassNotFoundException e) {
+            // Ignore
+        }
+        FOLIA_SUPPORTED = foliaSupported;
+    }
 
     /**
      * The server bootstrap.
@@ -86,7 +98,11 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
     private LoggingAdapter pluginLogger;
 
     private boolean loadAndBind() {
-        scheduler = new BukkitScheduler(this);
+        if (FOLIA_SUPPORTED) {
+            scheduler = new FoliaScheduler(this);
+        } else {
+            scheduler = new BukkitScheduler(this);
+        }
         pluginLogger = new JavaUtilLogger(getLogger());
         if (!getDataFolder().exists()) {
             if (!getDataFolder().mkdir()) {
@@ -338,7 +354,11 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
         if (debug) {
             getLogger().info("Got a " + protocolVersion.humanReadable + " vote record from " + remoteAddress + " -> " + vote);
         }
-        Bukkit.getScheduler().runTask(this, () -> fireVotifierEvent(vote));
+        if (FOLIA_SUPPORTED) {
+            Bukkit.getGlobalRegionScheduler().run(this, t -> fireVotifierEvent(vote));
+        } else {
+            Bukkit.getScheduler().runTask(this, () -> fireVotifierEvent(vote));
+        }
     }
 
     @Override
@@ -360,7 +380,11 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
         if (debug) {
             getLogger().info("Got a forwarded vote -> " + v);
         }
-        Bukkit.getScheduler().runTask(this, () -> fireVotifierEvent(v));
+        if (FOLIA_SUPPORTED) {
+            Bukkit.getGlobalRegionScheduler().run(this, t -> fireVotifierEvent(v));
+        } else {
+            Bukkit.getScheduler().runTask(this, () -> fireVotifierEvent(v));
+        }
     }
 
     private void fireVotifierEvent(Vote vote) {

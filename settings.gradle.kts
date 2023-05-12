@@ -9,6 +9,8 @@ project(":nuvotifier-common").projectDir = file("common")
 
 include("nuvotifier-bukkit")
 project(":nuvotifier-bukkit").projectDir = file("bukkit")
+include("nuvotifier-folia")
+project(":nuvotifier-folia").projectDir = file("folia")
 include("nuvotifier-bungeecord")
 project(":nuvotifier-bungeecord").projectDir = file("bungeecord")
 include("nuvotifier-sponge")

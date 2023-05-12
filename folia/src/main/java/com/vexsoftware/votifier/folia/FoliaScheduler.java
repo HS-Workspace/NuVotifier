@@ -1,5 +1,6 @@
-package com.vexsoftware.votifier;
+package com.vexsoftware.votifier.folia;
 
+import com.vexsoftware.votifier.NuVotifierBukkit;
 import com.vexsoftware.votifier.platform.scheduler.ScheduledVotifierTask;
 import com.vexsoftware.votifier.platform.scheduler.VotifierScheduler;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;

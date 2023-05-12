@@ -21,8 +21,6 @@ package com.vexsoftware.votifier;
 import com.vexsoftware.votifier.cmd.NVReloadCmd;
 import com.vexsoftware.votifier.cmd.TestVoteCmd;
 import com.vexsoftware.votifier.forwarding.BukkitPluginMessagingForwardingSink;
-import com.vexsoftware.votifier.support.forwarding.ForwardedVoteListener;
-import com.vexsoftware.votifier.support.forwarding.ForwardingVoteSink;
 import com.vexsoftware.votifier.model.Vote;
 import com.vexsoftware.votifier.model.VotifierEvent;
 import com.vexsoftware.votifier.net.VotifierServerBootstrap;
@@ -33,6 +31,8 @@ import com.vexsoftware.votifier.platform.JavaUtilLogger;
 import com.vexsoftware.votifier.platform.LoggingAdapter;
 import com.vexsoftware.votifier.platform.VotifierPlugin;
 import com.vexsoftware.votifier.platform.scheduler.VotifierScheduler;
+import com.vexsoftware.votifier.support.forwarding.ForwardedVoteListener;
+import com.vexsoftware.votifier.support.forwarding.ForwardingVoteSink;
 import com.vexsoftware.votifier.util.IOUtil;
 import com.vexsoftware.votifier.util.KeyCreator;
 import com.vexsoftware.votifier.util.TokenUtil;
@@ -60,18 +60,6 @@ import java.util.logging.Level;
  * @author Kramer Campbell
  */
 public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, VotifierPlugin, ForwardedVoteListener {
-    private static final boolean FOLIA_SUPPORTED;
-
-    static {
-        boolean foliaSupported = false;
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            foliaSupported = true;
-        } catch (ClassNotFoundException e) {
-            // Ignore
-        }
-        FOLIA_SUPPORTED = foliaSupported;
-    }
 
     /**
      * The server bootstrap.
@@ -98,11 +86,7 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
     private LoggingAdapter pluginLogger;
 
     private boolean loadAndBind() {
-        if (FOLIA_SUPPORTED) {
-            scheduler = new FoliaScheduler(this);
-        } else {
-            scheduler = new BukkitScheduler(this);
-        }
+        scheduler = loadScheduler();
         pluginLogger = new JavaUtilLogger(getLogger());
         if (!getDataFolder().exists()) {
             if (!getDataFolder().mkdir()) {
@@ -241,7 +225,8 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
             }
 
             this.bootstrap = new VotifierServerBootstrap(host, port, this, disablev1);
-            this.bootstrap.start(error -> {});
+            this.bootstrap.start(error -> {
+            });
         } else {
             getLogger().info("------------------------------------------------------------------------------");
             getLogger().info("Your Votifier port is less than 0, so we assume you do NOT want to start the");
@@ -333,6 +318,10 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
     @Override
     public VotifierScheduler getScheduler() {
         return scheduler;
+    }
+
+    protected VotifierScheduler loadScheduler() {
+        return new BukkitScheduler(this);
     }
 
     public boolean isDebug() {

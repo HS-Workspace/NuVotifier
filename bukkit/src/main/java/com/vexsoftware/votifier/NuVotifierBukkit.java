@@ -270,8 +270,7 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
 
     @Override
     public void onEnable() {
-        getCommand("nvreload").setExecutor(new NVReloadCmd(this));
-        getCommand("testvote").setExecutor(new TestVoteCmd(this));
+        loadCommands();
 
         if (!loadAndBind()) {
             gracefulExit();
@@ -322,6 +321,11 @@ public class NuVotifierBukkit extends JavaPlugin implements VoteHandler, Votifie
 
     protected VotifierScheduler loadScheduler() {
         return new BukkitScheduler(this);
+    }
+
+    protected void loadCommands() {
+        getCommand("nvreload").setExecutor(new NVReloadCmd(this));
+        getCommand("testvote").setExecutor(new TestVoteCmd(this));
     }
 
     public boolean isDebug() {

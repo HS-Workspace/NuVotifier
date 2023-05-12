@@ -25,4 +25,9 @@ public class NuVotifierFolia extends NuVotifierBukkit {
             return super.loadScheduler();
         }
     }
+
+    @Override
+    protected void loadCommands() {
+        // TODO: Register commands
+    }
 }
